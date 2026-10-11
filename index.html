@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>התחשבנות קניות לדירה - טינדר שותפים 🛒</title>
+  <meta name="description" content="אפליקציית חלוקת קניות לשותפים בדירה - החלקה ימינה ושמאלה לחישוב מדויק של חשבון רמי לוי ומקס סטוק">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%3E%3Ctext y=%2226%22 font-size=%2226%22%3E🛒%3C/text%3E%3C/svg%3E">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Orbs -->
+  <div class="aurora-bg">
+    <div class="aurora-orb orb-1"></div>
+    <div class="aurora-orb orb-2"></div>
+    <div class="aurora-orb orb-3"></div>
+  </div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Main App Shell -->
+  <main class="app-container">
+
+    <!-- Top Header Navigation -->
+    <header class="app-header">
+      <div class="header-top">
+        <div class="brand-wrapper">
+          <div class="brand-icon">🛒</div>
+          <div>
+            <h1 class="brand-title">SplitMate</h1>
+            <p class="brand-subtitle">התחשבנות קניות לדירה • החלק להשתתפות</p>
+          </div>
+        </div>
+
+        <!-- Live Amount Pill (Clickable to view summary anytime) -->
+        <div class="live-bill-pill" id="btn-open-summary" title="לחץ לצפייה בסיכום המלא">
+          <span class="live-bill-label">החלק שלך לתשלום</span>
+          <span class="live-bill-amount" id="live-share-amount">0.00 ₪</span>
+        </div>
+      </div>
+
+      <!-- Filter Tabs and View Toggle -->
+      <div class="filter-mode-bar">
+        <div class="filter-pills" id="store-filters">
+          <button class="filter-pill active" data-filter="all" id="filter-all">הכל (61)</button>
+          <button class="filter-pill rami" data-filter="rami_levy" id="filter-rami">רמי לוי (33)</button>
+          <button class="filter-pill max" data-filter="max_stock" id="filter-max">מקס סטוק (28)</button>
+        </div>
+
+        <button class="mode-toggle-btn" id="btn-toggle-mode" title="מעבר בין כרטיסיות לרשימה">
+          <span id="mode-icon">📋</span>
+          <span id="mode-text">רשימה</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Progress Indicator -->
+    <section class="progress-container" aria-label="התקדמות בדיקה">
+      <div class="progress-info">
+        <span id="progress-text">מוצר 1 מתוך 61</span>
+        <span id="progress-percentage">0% הושלם</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+      </div>
+    </section>
+
+    <!-- TINDER SWIPE VIEWPORT -->
+    <section class="tinder-viewport" id="tinder-view">
+      <!-- Card Stack Deck -->
+      <div class="card-deck" id="card-deck">
+        <!-- Cards will be dynamically injected here by app.js -->
+      </div>
+
+      <!-- Floating Tinder Controls -->
+      <nav class="tinder-controls" aria-label="פעולות החלקה">
+        <!-- Undo Button -->
+        <button class="btn-action btn-undo" id="btn-undo" title="בטל פעולה קודמת (Z)" aria-label="ביטול פעולה קודמת">
+          ↩️
+          <span class="action-label-tooltip">חזרה</span>
+        </button>
+
+        <!-- Pass Button (Swipe Left) -->
+        <button class="btn-action btn-pass" id="btn-pass" title="לא משתתף (חץ שמאלה)" aria-label="לא משתתף">
+          ❌
+          <span class="action-label-tooltip">לא משתתף</span>
+        </button>
+
+        <!-- Share 50% Button (Swipe Right) -->
+        <button class="btn-action btn-share" id="btn-share" title="משתתף חצי (חץ ימינה)" aria-label="משתתף חצי">
+          🤝
+          <span class="action-label-tooltip">חצי חצי</span>
+        </button>
+
+        <!-- Full 100% Button (Swipe Up) -->
+        <button class="btn-action btn-full" id="btn-full" title="שלי מלא 100% (חץ למעלה)" aria-label="משתתף מלא">
+          👑
+          <span class="action-label-tooltip">מלא (100%)</span>
+        </button>
+      </nav>
+
+      <!-- Desktop Keyboard Hint -->
+      <footer class="keyboard-hint">
+        <span>מקשי מקלדת:</span>
+        <span><span class="key-badge">←</span> דלג</span>
+        <span><span class="key-badge">→</span> חצי (50%)</span>
+        <span><span class="key-badge">↑</span> מלא</span>
+        <span><span class="key-badge">Z</span> ביטול</span>
+      </footer>
+    </section>
+
+    <!-- FAST LIST VIEW SECTION (Alternative View) -->
+    <section class="list-view-section" id="list-view">
+      <div class="list-controls-bar">
+        <div class="search-input-wrapper">
+          <input type="text" class="search-input" id="list-search-input" placeholder="חיפוש מוצר או ברקוד...">
+          <span class="search-icon">🔍</span>
+        </div>
+        <button class="filter-pill active" id="btn-view-summary-from-list">סיכום 📊</button>
+      </div>
+
+      <div class="list-items-container" id="list-items-container">
+        <!-- Populated dynamically by app.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- SUMMARY & SETTLEMENT MODAL -->
+  <div class="summary-modal" id="summary-modal">
+    <div class="summary-content">
+      
+      <!-- Modal Header -->
+      <div class="summary-header">
+        <div class="summary-title-box">
+          <span style="font-size: 28px;">🎉</span>
+          <h2 class="summary-title">סיכום התחשבנות</h2>
+        </div>
+        <button class="btn-close-summary" id="btn-close-summary" title="סגור סיכום">✕</button>
+      </div>
+
+      <!-- Main Highlight Result Card -->
+      <div class="settlement-card">
+        <span class="settlement-label">הסכום שהשותף מעביר לך</span>
+        <div class="settlement-amount-big" id="summary-partner-owes">0.00 ₪</div>
+        <p class="settlement-sub" id="summary-partner-desc">
+          מחושב מתוך הפריטים שאושרו להשתתפות
+        </p>
+
+        <!-- 3 Stats Overview -->
+        <div class="settlement-stats-row">
+          <div class="stat-box">
+            <span class="stat-label">סה"כ קניות</span>
+            <span class="stat-val" id="summary-total-spent">794.90 ₪</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">חלקך שנותר</span>
+            <span class="stat-val" id="summary-my-share">794.90 ₪</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">מוצרים שאושרו</span>
+            <span class="stat-val" id="summary-approved-count">0 / 61</span>
+          </div>
+        </div>
+
+        <div class="settlement-stats-row" style="padding-top: 6px; border-top: none;">
+          <div class="stat-box">
+            <span class="stat-label">רמי לוי (קבלה 1)</span>
+            <span class="stat-val" style="color: #f87171;">414.40 ₪</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">מקס סטוק (קבלה 2)</span>
+            <span class="stat-val" style="color: #60a5fa;">380.50 ₪</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">הפרש חיסכון</span>
+            <span class="stat-val" style="color: #34d399;">50% / 100%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action CTAs -->
+      <div class="summary-actions-grid">
+        <button class="btn-cta whatsapp" id="btn-send-whatsapp">
+          <span>💬</span>
+          <span>שלח סיכום לשותף ב-WhatsApp</span>
+        </button>
+        <button class="btn-cta copy" id="btn-copy-summary">
+          <span>📋</span>
+          <span>העתק סיכום</span>
+        </button>
+        <button class="btn-cta restart" id="btn-restart-app">
+          <span>🔄</span>
+          <span>התחל מחדש</span>
+        </button>
+      </div>
+
+      <!-- Detailed Items Breakdown Section -->
+      <section class="breakdown-section">
+        <div class="breakdown-title">
+          <span>פירוט מלא של המוצרים:</span>
+          <span id="breakdown-filter-stats" style="color: var(--text-dim); font-size: 12px;"></span>
+        </div>
+
+        <div class="breakdown-list" id="breakdown-list">
+          <!-- Injected dynamically by app.js -->
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Toast Message Element -->
+  <div class="toast-msg" id="toast-msg">הועתק בהצלחה!</div>
+
+  <!-- Data and Application Logic Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

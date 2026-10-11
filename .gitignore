@@ -1,0 +1,4 @@
+# SplitMate Git Ignore
+__pycache__/
+*.pyc
+.DS_Store
